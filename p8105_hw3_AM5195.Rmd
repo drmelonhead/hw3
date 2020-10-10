@@ -7,3 +7,26 @@ output: github_document
 ```{r}
 library(tidyverse)
 ```
+
+
+## Problem 1
+Load instacart data
+```{r}
+library(p8105.datasets)
+data("instacart")
+
+```
+
+
+The dataset `instacart` includes the following variables: `r names(instacart)`. This dataset has `r nrow(instacart)` rows and  `r ncol(instacart)` columns. Each row represents a single item in `r n_distinct(instacart$order_id)` orders. The varaiblase `order_ _dow` and `order_hour_of_day` indicates the day and time the order was placed.The variable `porduct_name` describes the item. The first three items in this dataset are: `r head(instacart$product_name, n=3)`.
+
+
+
+```{r}
+group_by(instacart,order_id) %>% 
+  summarise(n=n())
+```
+
+```{r}
+
+```
