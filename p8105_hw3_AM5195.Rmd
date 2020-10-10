@@ -21,12 +21,33 @@ data("instacart")
 The dataset `instacart` includes the following variables: `r names(instacart)`. This dataset has `r nrow(instacart)` rows and  `r ncol(instacart)` columns. Each row represents a single item in `r n_distinct(instacart$order_id)` orders. The varaiblase `order_ _dow` and `order_hour_of_day` indicates the day and time the order was placed.The variable `porduct_name` describes the item. The first three items in this dataset are: `r head(instacart$product_name, n=3)`.
 
 
+There are n_distinct `r n_distinct(instacart$aisle_id)` aisles, and the most items are ordered from aisle `r summarise(instacart, c = names(table(aisle_id))[which.max(table(aisle_id))])`.
 
-```{r}
-group_by(instacart,order_id) %>% 
-  summarise(n=n())
+
+To make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered, I create a datafrom consisting of aisles and number of orders
+
+```{r warning=FALSE}
+order_aisle = instacart %>% 
+  group_by(aisle_id) %>% 
+  summarise(n=n()) %>% 
+  filter(n>10000) %>%
+  arrange(n)%>%
+  mutate(rank=rank(n))
 ```
 
-```{r}
+Next I use ggplot to make a bar graph, with aisles arranged by increasing order number. I use the guide_axis option in scale_x_discrete to make the x-axis legible and correspond to the original aisle numbers. 
 
+```{r}
+ggplot(order_aisle, aes(x=factor(rank), y=n, )) +
+  geom_bar(stat="identity")+
+  theme_minimal()+
+  labs(
+    title = "Orders per aisle",
+    x = "Aisle number",
+    y = "Orders") +
+  scale_x_discrete(
+    labels=order_aisle$aisle_id,
+    guide = guide_axis(n.dodge=2)
+  )
 ```
+
