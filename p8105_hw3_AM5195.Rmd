@@ -17,12 +17,16 @@ data("instacart")
 
 ```
 
+**The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. Then, do or answer the following (commenting on the results of each):**
 
 The dataset `instacart` includes the following variables: `r names(instacart)`. This dataset has `r nrow(instacart)` rows and  `r ncol(instacart)` columns. Each row represents a single item in `r n_distinct(instacart$order_id)` orders. The varaiblase `order_ _dow` and `order_hour_of_day` indicates the day and time the order was placed.The variable `porduct_name` describes the item. The first three items in this dataset are: `r head(instacart$product_name, n=3)`.
 
+**How many aisles are there, and which aisles are the most items ordered from?**
 
 There are n_distinct `r n_distinct(instacart$aisle_id)` aisles, and the most items are ordered from aisle `r summarise(instacart, c = names(table(aisle_id))[which.max(table(aisle_id))])`.
 
+
+**Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.**
 
 To make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered, I create a datafrom consisting of aisles and number of orders
 
@@ -51,7 +55,7 @@ ggplot(order_aisle, aes(x=factor(rank), y=n, )) +
   )
 ```
 
-Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
+**Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.**
 
 ```{r}
   instacart %>% 
@@ -65,7 +69,7 @@ Make a table showing the three most popular items in each of the aisles “bakin
 
 ```
 
-Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+**Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).**
 
 ```{r}
   instacart %>% 
@@ -87,9 +91,10 @@ Make a table showing the mean hour of the day at which Pink Lady Apples and Coff
     
  
 ```
-##Problem 2
+## Problem 2
 
-Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
+**Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).**
+
 ```{r}
 accel_data <- read_csv("data/accel_data.csv") %>%
   pivot_longer(
@@ -102,3 +107,5 @@ accel_data <- read_csv("data/accel_data.csv") %>%
 
 ```
 The data set `accel_data` The  includes the following variables: `r names(accel_data)`. This dataset has `r nrow(accel_data)` rows and  `r ncol(accel_data)` columns. 
+
+**Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?**
