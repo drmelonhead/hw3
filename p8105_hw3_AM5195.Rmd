@@ -6,6 +6,7 @@ output: github_document
 
 ```{r}
 library(tidyverse)
+library(ggplot2)
 ```
 
 
@@ -103,9 +104,66 @@ accel_data <- read_csv("data/accel_data.csv") %>%
     names_to="minute",
     values_to="activity_count"
   ) %>% 
-  mutate(weekend=ifelse(day %in% c("Saturday", "Sunday"), TRUE, FALSE))
+  mutate(weekend=ifelse(day %in% c("Saturday", "Sunday"), TRUE, FALSE)) %>% 
+  mutate(minute=as.numeric(minute))
 
 ```
 The data set `accel_data` The  includes the following variables: `r names(accel_data)`. This dataset has `r nrow(accel_data)` rows and  `r ncol(accel_data)` columns. 
 
 **Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?**
+
+```{r}
+accel_data %>%
+  group_by(day_id,day,weekend) %>% 
+  summarise(total_activity=
+              sum(activity_count),
+            ) %>% 
+    knitr::kable(digits = 1)
+  
+```
+
+Honestly no trends jump out at me from looking at this table. I tried a ridge plot to get more of a sense of how activity varied across day of the week:
+
+```{r}
+library(ggridges)
+accel_data %>%
+  group_by(day_id,day,weekend) %>% 
+  summarise(total_activity=
+              sum(activity_count),
+            ) %>% 
+    ggplot(aes(x=total_activity,y=day))+
+  geom_density_ridges()
+
+```
+And a scatter with smooth to see how activity behaved over the study
+
+```{r}
+library(ggridges)
+accel_data %>%
+  group_by(day_id,day,weekend) %>% 
+  summarise(total_activity=
+              sum(activity_count),
+            ) %>% 
+    ggplot(aes(y=total_activity,x=day_id, color=day))+
+  geom_point() 
+
+```
+
+All I might guess is that the person does a more constant amount of activity on tuesday to thrusday than on other days.
+
+**Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph**
+
+
+```{r}
+library(plotly)
+ggplot(accel_data, aes(x=minute, y=activity_count, color=day))+
+  geom_point(alpha=0.05, size=1)+
+  geom_smooth(se=FALSE)+
+  scale_x_continuous(
+    breaks = seq(from = 0, to = 1440, by = 120))+
+  scale_y_continuous(trans = "log10")+
+  scale_fill_viridis_c()  +
+  theme(axis.text.x=element_text(angle=45,hjust=1))
+
+```
+We can see that on most day activity is minimal between minutes 0 and 240, and then increases. Activity drops off again after at approximately minute 1260. Saturday appears to be a lazier day. Minute-by-minute activity varies considerably. 
