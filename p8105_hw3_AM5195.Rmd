@@ -87,4 +87,15 @@ Make a table showing the mean hour of the day at which Pink Lady Apples and Coff
     
  
 ```
+##Problem 2
+
+Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
+```{r}
+accel_data <- read_csv("data/accel_data.csv") %>%
+  pivot_longer(
+    activity.1:activity.1440,
+    names_prefix="activity.",
+    names_to="minute"
+  )
+```
 
