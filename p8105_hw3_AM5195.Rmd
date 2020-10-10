@@ -26,7 +26,7 @@ There are n_distinct `r n_distinct(instacart$aisle_id)` aisles, and the most ite
 
 To make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered, I create a datafrom consisting of aisles and number of orders
 
-```{r warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 order_aisle = instacart %>% 
   group_by(aisle_id) %>% 
   summarise(n=n()) %>% 
@@ -50,4 +50,19 @@ ggplot(order_aisle, aes(x=factor(rank), y=n, )) +
     guide = guide_axis(n.dodge=2)
   )
 ```
+
+Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
+
+```{r}
+  instacart %>% 
+  filter(aisle=="baking ingredients" | aisle=="dog food care" | aisle=="packaged vegetables fruits") %>% 
+  group_by(aisle) %>% 
+  count(product_name) %>% 
+  arrange(-n) %>% 
+  mutate(item_rank=rank(-n)) %>% 
+  filter(item_rank<4) %>% 
+  knitr::kable(digits = 1)
+
+```
+
 
