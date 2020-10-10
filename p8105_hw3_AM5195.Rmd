@@ -95,7 +95,10 @@ accel_data <- read_csv("data/accel_data.csv") %>%
   pivot_longer(
     activity.1:activity.1440,
     names_prefix="activity.",
-    names_to="minute"
-  )
-```
+    names_to="minute",
+    values_to="activity_count"
+  ) %>% 
+  mutate(weekend=ifelse(day %in% c("Saturday", "Sunday"), TRUE, FALSE))
 
+```
+The data set `accel_data` The  includes the following variables: `r names(accel_data)`. This dataset has `r nrow(accel_data)` rows and  `r ncol(accel_data)` columns. 
