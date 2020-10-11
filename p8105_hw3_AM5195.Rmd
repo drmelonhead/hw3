@@ -177,12 +177,15 @@ data("ny_noaa")
 ```
 **The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. Then, do or answer the following (commenting on the results of each):**
 
-The data set `ny_noaa` The  includes the following variables: `r names(ny_noaa)`. This dataset has `r nrow(ny_noaa)` rows and  `r ncol(ny_noaa)` columns. The variable `id` identifies `r n_distinct(ny_noaa$id)` weather stations for which precipitation, maximum daily temperature, minimum daily temperature, and snowfall data are available from `r min(ny_noaa$date)` to `r max(ny_noaa$date)`. Precipitation is missing in `r sum(is.na(ny_noaa$prcp))` observations, snowfall is missing in `r sum(is.na(ny_noaa$snow))` observations, daily max temp is missing in `r sum(is.na(ny_noaa$tmax))` observatoins, and daily minimum temp is missing in `r sum(is.na(ny_noaa$tmin))` observations.
+The data set `ny_noaa` The  includes the following variables: `r names(ny_noaa)`. This dataset has `r nrow(ny_noaa)` rows and  `r ncol(ny_noaa)` columns. The variable `id` identifies `r n_distinct(ny_noaa$id)` weather stations for which precipitation, maximum daily temperature, minimum daily temperature, and snowfall data are available from `r min(ny_noaa$date)` to `r max(ny_noaa$date)`. Precipitation is missing in `r sum(is.na(ny_noaa$prcp))` observations, snowfall is missing in `r sum(is.na(ny_noaa$snow))` observations, daily max temp is missing in `r sum(is.na(ny_noaa$tmax))` observations, and daily minimum temp is missing in `r sum(is.na(ny_noaa$tmin))` observations.
 
 
 **Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?**
 
 ```{r}
+library(p8105.datasets)
+data("ny_noaa")
+
 ny_noaa = ny_noaa %>% 
   mutate(year = lubridate::year(date), 
                 month = lubridate::month(date), 
@@ -193,6 +196,47 @@ ny_noaa = ny_noaa %>%
   mutate(tmax=(as.numeric(tmax))/10) %>%
   mutate(tmin=(as.numeric(tmin))/10)
          
+ny_noaa %>% 
+    count(snow, sort = TRUE)
+```
 
+The most common observed value of snow fall is 0.0 followed by "NA." Since id doesn't snow most days, 0.0 makes sense, I am not sure why so much of the data is missing. 
+
+**Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?**
+
+```{r}
+max_df = ny_noaa %>% 
+  filter(month==1 | month==7) %>% 
+  filter(!is.na(tmax)) %>% 
+  group_by(id, month, year) %>% 
+  summarise(
+    mean_max=mean(tmax)) %>% 
+  mutate(month_name=month.name[month])
+
+ggplot(max_df, aes(x = year, y = mean_max, color = month_name)) + 
+  geom_point(alpha = .1) +
+  geom_smooth(se = FALSE) + 
+  facet_grid(. ~ month_name)       
+```
+
+
+**Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.**
+
+
+
+```{r}
+library(patchwork)
+panel1=
+  ggplot(ny_noaa, aes(x = tmax, y = tmin,))+
+  geom_hex(alpha=0.8)+
+  scale_fill_viridis_c()
+panel2=
+  ny_noaa %>% 
+  filter(snow>0) %>% 
+  filter(snow<100) %>% 
+  ggplot(aes(x=year,y=snow))+
+  geom_boxplot(aes(group=year))
+
+panel1+panel2
 ```
 
